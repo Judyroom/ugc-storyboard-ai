@@ -1,0 +1,13 @@
+.next
+node_modules
+dist
+build
+coverage
+.venv
+__pycache__
+.pytest_cache
+.env
+.env.local
+*.pyc
+apps/api/generated/*
+!apps/api/generated/.gitkeep

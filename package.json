@@ -1,0 +1,14 @@
+{
+  "name": "ugc-storyboard-mini-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev:web",
+    "dev:web": "npm --prefix apps/web run dev",
+    "dev:api": "py -3.12 -m uvicorn main:app --reload --app-dir apps/api",
+    "build": "npm --prefix apps/web run build",
+    "lint": "npm --prefix apps/web run lint",
+    "typecheck": "npm --prefix apps/web run typecheck",
+    "test:api": "py -3.12 -m pytest apps/api/tests"
+  }
+}
