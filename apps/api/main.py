@@ -11,9 +11,9 @@ from app.schemas import GenerateRequest, GenerateResponse
 from app.workflow import generate_storyboard
 
 
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
+
 GENERATED_DIR = BASE_DIR / "generated"
 GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 

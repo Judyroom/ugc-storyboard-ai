@@ -56,4 +56,4 @@ Open `http://localhost:3000`.
 ## Deployment
 
 - Deploy `apps/web` to Vercel. Set `NEXT_PUBLIC_API_BASE_URL` to the public backend URL.
-- Deploy `apps/api` to a Hugging Face Docker Space. Set `PUBLIC_BASE_URL`, `CORS_ORIGINS`, `GOOGLE_API_KEY`, and optional `HF_TOKEN`.
+- Deploy `apps/api` to a Hugging Face Docker Space. Set `PUBLIC_BASE_URL`, `CORS_ORIGINS`, `DEEPSEEK_API_KEY`, and optional `HF_TOKEN`.

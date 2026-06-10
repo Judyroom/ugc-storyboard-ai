@@ -4,7 +4,7 @@ pydantic
 pydantic-settings
 langgraph
 langchain
-langchain-google-genai
+langchain-openai
 huggingface_hub
 edge-tts
 python-dotenv

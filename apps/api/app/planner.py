@@ -22,15 +22,16 @@ def _extract_json(text: str) -> dict[str, Any]:
 
 
 async def plan_storyboard(user_prompt: str) -> Storyboard:
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("LLM_API_KEY")
     if not api_key:
-        raise RuntimeError("GOOGLE_API_KEY is not configured.")
+        raise RuntimeError("DEEPSEEK_API_KEY is not configured.")
 
-    from langchain_google_genai import ChatGoogleGenerativeAI
+    from langchain_openai import ChatOpenAI
 
-    model = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
-        google_api_key=api_key,
+    model = ChatOpenAI(
+        model=os.getenv("DEEPSEEK_MODEL", os.getenv("LLM_MODEL", "deepseek-chat")),
+        api_key=api_key,
+        base_url=os.getenv("DEEPSEEK_BASE_URL", os.getenv("LLM_BASE_URL", "https://api.deepseek.com")),
         temperature=0.8,
     )
     result = await model.ainvoke(

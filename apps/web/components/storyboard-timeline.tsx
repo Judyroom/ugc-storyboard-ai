@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Download, FileJson, Play, Volume2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Download, FileJson, Pause, Play, Volume2 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,14 +14,13 @@ type StoryboardTimelineProps = {
   storyboard: GenerateResponse;
 };
 
-function playAudioUrl(url: string) {
-  return new Promise<void>((resolve, reject) => {
-    const audio = new Audio(url);
-    audio.onended = () => resolve();
-    audio.onerror = () => reject(new Error("Audio playback failed."));
-    void audio.play().catch(reject);
-  });
-}
+type PlaybackMode = "single" | "all";
+
+type PlaybackState = {
+  sceneId: number | null;
+  mode: PlaybackMode | null;
+  isPlaying: boolean;
+};
 
 function exportJson(storyboard: GenerateResponse) {
   const blob = new Blob([JSON.stringify(storyboard, null, 2)], {
@@ -39,10 +38,12 @@ function SceneCard({
   scene,
   index,
   onPlay,
+  isPlaying,
 }: {
   scene: StoryboardScene;
   index: number;
   onPlay: (scene: StoryboardScene) => void;
+  isPlaying: boolean;
 }) {
   const reduceMotion = useReducedMotion();
 
@@ -75,8 +76,8 @@ function SceneCard({
             onClick={() => onPlay(scene)}
             className="border-white/10 bg-black/20 text-zinc-100 hover:bg-white/10 hover:text-white"
           >
-            <Play className="h-4 w-4" />
-            {scene.audio_url ? "Play voice" : "Voice unavailable"}
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {scene.audio_url ? (isPlaying ? "Pause voice" : "Play voice") : "Voice unavailable"}
           </Button>
         </div>
       </div>
@@ -105,26 +106,132 @@ function SceneCard({
 
 export function StoryboardTimeline({ storyboard }: StoryboardTimelineProps) {
   const [playbackStatus, setPlaybackStatus] = useState<string | null>(null);
+  const [playback, setPlayback] = useState<PlaybackState>({
+    sceneId: null,
+    mode: null,
+    isPlaying: false,
+  });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playAllQueueRef = useRef<StoryboardScene[]>([]);
   const playableScenes = storyboard.scenes.filter((scene) => scene.audio_url);
 
-  async function handlePlay(scene: StoryboardScene) {
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    return () => {
+      audio?.pause();
+      audioRef.current = null;
+      playAllQueueRef.current = [];
+    };
+  }, []);
+
+  function stopCurrentAudio() {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+  }
+
+  function playScene(scene: StoryboardScene, mode: PlaybackMode) {
     if (!scene.audio_url) {
       return;
     }
 
-    setPlaybackStatus(`Playing scene ${scene.id}`);
-    try {
-      await playAudioUrl(scene.audio_url);
+    stopCurrentAudio();
+
+    const audio = new Audio(scene.audio_url);
+    audioRef.current = audio;
+    setPlayback({
+      sceneId: scene.id,
+      mode,
+      isPlaying: true,
+    });
+    setPlaybackStatus(
+      mode === "all" ? `Playing all: scene ${scene.id}` : `Playing scene ${scene.id}`
+    );
+
+    audio.onended = () => {
+      if (mode === "all") {
+        const [nextScene, ...remainingScenes] = playAllQueueRef.current;
+        playAllQueueRef.current = remainingScenes;
+        if (nextScene) {
+          playScene(nextScene, "all");
+          return;
+        }
+      }
+
+      audioRef.current = null;
+      setPlayback({ sceneId: null, mode: null, isPlaying: false });
       setPlaybackStatus(null);
-    } catch {
+    };
+
+    audio.onerror = () => {
+      audioRef.current = null;
+      playAllQueueRef.current = [];
+      setPlayback({ sceneId: null, mode: null, isPlaying: false });
       setPlaybackStatus("Audio playback failed");
-    }
+    };
+
+    void audio.play().catch(() => {
+      audioRef.current = null;
+      playAllQueueRef.current = [];
+      setPlayback({ sceneId: null, mode: null, isPlaying: false });
+      setPlaybackStatus("Audio playback failed");
+    });
   }
 
-  async function handlePlayAll() {
-    for (const scene of playableScenes) {
-      await handlePlay(scene);
+  function handlePlay(scene: StoryboardScene) {
+    if (!scene.audio_url) {
+      return;
     }
+
+    if (playback.sceneId === scene.id && playback.isPlaying) {
+      audioRef.current?.pause();
+      setPlayback((current) => ({ ...current, isPlaying: false }));
+      setPlaybackStatus(`Paused scene ${scene.id}`);
+      return;
+    }
+
+    if (playback.sceneId === scene.id && !playback.isPlaying && audioRef.current) {
+      void audioRef.current.play().then(() => {
+        setPlayback((current) => ({ ...current, isPlaying: true }));
+        setPlaybackStatus(
+          playback.mode === "all" ? `Playing all: scene ${scene.id}` : `Playing scene ${scene.id}`
+        );
+      });
+      return;
+    }
+
+    playAllQueueRef.current = [];
+    playScene(scene, "single");
+  }
+
+  function handlePlayAll() {
+    if (playableScenes.length === 0) {
+      return;
+    }
+
+    if (playback.mode === "all" && playback.isPlaying) {
+      audioRef.current?.pause();
+      setPlayback((current) => ({ ...current, isPlaying: false }));
+      setPlaybackStatus("Paused play all");
+      return;
+    }
+
+    if (playback.mode === "all" && !playback.isPlaying && audioRef.current) {
+      void audioRef.current.play().then(() => {
+        setPlayback((current) => ({ ...current, isPlaying: true }));
+        setPlaybackStatus(
+          playback.sceneId ? `Playing all: scene ${playback.sceneId}` : "Playing all"
+        );
+      });
+      return;
+    }
+
+    const [firstScene, ...remainingScenes] = playableScenes;
+    playAllQueueRef.current = remainingScenes;
+    playScene(firstScene, "all");
   }
 
   return (
@@ -152,8 +259,12 @@ export function StoryboardTimeline({ storyboard }: StoryboardTimelineProps) {
             onClick={handlePlayAll}
             className="border-white/10 bg-white/[0.04] text-zinc-100 hover:bg-white/10 hover:text-white"
           >
-            <Volume2 className="h-4 w-4" />
-            Play all
+            {playback.mode === "all" && playback.isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+            {playback.mode === "all" && playback.isPlaying ? "Pause all" : "Play all"}
           </Button>
           <Button
             type="button"
@@ -186,7 +297,13 @@ export function StoryboardTimeline({ storyboard }: StoryboardTimelineProps) {
 
       <div className="space-y-4">
         {storyboard.scenes.map((scene, index) => (
-          <SceneCard key={scene.id} scene={scene} index={index} onPlay={handlePlay} />
+          <SceneCard
+            key={scene.id}
+            scene={scene}
+            index={index}
+            onPlay={handlePlay}
+            isPlaying={playback.sceneId === scene.id && playback.isPlaying}
+          />
         ))}
       </div>
     </section>
