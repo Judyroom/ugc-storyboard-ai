@@ -11,3 +11,6 @@ __pycache__
 *.pyc
 apps/api/generated/*
 !apps/api/generated/.gitkeep
+
+# Local planning notes, kept off GitHub
+md/

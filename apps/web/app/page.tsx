@@ -1,94 +1,216 @@
 "use client";
 
-import { useState } from "react";
-import { AlertCircle, Clapperboard, WandSparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertCircle } from "lucide-react";
 
-import { PipelineProgress } from "@/components/pipeline-progress";
 import { PromptComposer } from "@/components/prompt-composer";
-import { StoryboardTimeline } from "@/components/storyboard-timeline";
-import { generateStoryboard, type GenerateResponse } from "@/lib/storyboard";
+import { FrameGuides, StoryboardTimeline } from "@/components/storyboard-timeline";
+import { useI18n, type Locale } from "@/lib/i18n";
+import { SAMPLES, findSample, sampleStoryboard } from "@/lib/samples";
+import {
+  PHOTO_PROVIDERS,
+  fetchProviders,
+  generateStoryboard,
+  type GenerateResponse,
+  type Orientation,
+  type Providers,
+} from "@/lib/storyboard";
+import { cn } from "@/lib/utils";
+
+const ORIENTATION_KEY = "ugc-storyboard-orientation";
+
+const LOCALES: { value: Locale; label: string }[] = [
+  { value: "zh", label: "中文" },
+  { value: "en", label: "EN" },
+];
+
+function LanguageSwitch() {
+  const { locale, t, setLocale } = useI18n();
+
+  return (
+    <div role="group" aria-label={t.languageLabel} className="flex rounded-full border border-rule p-0.5">
+      {LOCALES.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          aria-pressed={locale === option.value}
+          onClick={() => setLocale(option.value)}
+          className={cn(
+            "h-7 rounded-full px-3 text-xs font-medium transition-colors",
+            locale === option.value ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function EmptyBoard({ orientation }: { orientation: Orientation }) {
+  const { t } = useI18n();
+  const isPortrait = orientation === "portrait";
+
+  return (
+    <section className="rounded-2xl border border-dashed border-rule p-5 sm:p-8">
+      <div className={cn("mx-auto grid grid-cols-3 gap-3 sm:gap-5", isPortrait ? "max-w-2xl" : "max-w-4xl")}>
+        {[1, 2, 3].map((id) => (
+          <div
+            key={id}
+            className={cn("relative rounded-lg border border-rule bg-sheet", isPortrait ? "aspect-[9/16]" : "aspect-video")}
+          >
+            <FrameGuides className="text-rule" />
+            <span className="absolute left-2.5 top-2.5 font-mono text-[11px] text-ink-3">
+              S{String(id).padStart(2, "0")}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 text-center">
+        <p className="text-sm font-medium text-ink">{t.emptyTitle}</p>
+        <p className="mt-1 text-sm text-ink-2">{t.emptyBody}</p>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("一个北欧风格的奢侈品项链");
+  const { locale, t } = useI18n();
+  const [prompt, setPrompt] = useState(SAMPLES[0].prompt.zh);
+  const [orientation, setOrientation] = useState<Orientation>("portrait");
   const [storyboard, setStoryboard] = useState<GenerateResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  // Unknown until /providers answers (or stays unknown if the API is unreachable).
+  const [providers, setProviders] = useState<Providers | null>(null);
+
+  useEffect(() => {
+    void fetchProviders().then(setProviders);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(ORIENTATION_KEY);
+      if (stored === "portrait" || stored === "landscape") {
+        setOrientation(stored);
+      }
+    } catch {
+      // Storage can be blocked; portrait stays the default.
+    }
+  }, []);
+
+  // A sample brief follows the language; text the user typed is never touched.
+  // A loaded sample storyboard re-renders in the new language too, since it ships in both.
+  useEffect(() => {
+    setPrompt((current) => findSample(current)?.prompt[locale] ?? current);
+    setStoryboard((current) => (current?.sample_id ? sampleStoryboard(current.sample_id, locale, current.orientation ?? "portrait") : current));
+  }, [locale]);
+
+  function handleOrientationChange(next: Orientation) {
+    setOrientation(next);
+    try {
+      window.localStorage.setItem(ORIENTATION_KEY, next);
+    } catch {
+      // Not persisted; still applies for this visit.
+    }
+    // Samples have frames for both orientations, so switch them live. API results keep the
+    // frame shape they were generated at; the new orientation applies to the next generation.
+    setStoryboard((current) => (current?.sample_id ? sampleStoryboard(current.sample_id, locale, next) : current));
+  }
+
+  function showResults() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.requestAnimationFrame(() =>
+      resultsRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" })
+    );
+  }
 
   async function handleGenerate() {
     const trimmedPrompt = prompt.trim();
-    if (!trimmedPrompt || isGenerating) {
+    if (trimmedPrompt.length < 2 || isGenerating) {
+      return;
+    }
+
+    setError(null);
+    const sample = findSample(trimmedPrompt);
+    if (sample) {
+      setStoryboard(sampleStoryboard(sample.id, locale, orientation));
+      showResults();
       return;
     }
 
     setIsGenerating(true);
-    setError(null);
     try {
-      const result = await generateStoryboard(trimmedPrompt);
+      const result = await generateStoryboard(trimmedPrompt, locale, orientation);
       setStoryboard(result);
+      showResults();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Generation failed.");
+      setError(err instanceof Error ? err.message : t.requestFailed);
     } finally {
       setIsGenerating(false);
     }
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_10%,rgba(139,92,246,0.24),transparent_32%),radial-gradient(circle_at_85%_5%,rgba(34,211,238,0.14),transparent_30%),#050505] text-zinc-50">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <header className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-300 text-zinc-950">
-              <Clapperboard className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-zinc-100">UGC Storyboard AI</p>
-              <p className="text-xs text-zinc-500">Agentic mini demo</p>
-            </div>
+    <main className="min-h-screen bg-paper text-ink">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+        <header className="flex h-16 items-center justify-between gap-4 border-b border-rule">
+          <div className="flex items-baseline gap-3">
+            <span className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+              <span aria-hidden className="h-2 w-2 translate-y-[-1px] rounded-full bg-signal" />
+              {t.appName}
+            </span>
+            <span className="hidden font-mono text-xs text-ink-3 sm:inline">{t.appTagline}</span>
           </div>
-          <div className="hidden rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 sm:block">
-            Next.js + FastAPI + LangGraph
-          </div>
+          <LanguageSwitch />
         </header>
 
-        <section className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet-300/20 bg-violet-300/10 px-3 py-1 text-sm text-violet-100">
-              <WandSparkles className="h-4 w-4" />
-              One sentence to UGC video storyboard
-            </div>
-            <div className="space-y-4">
-              <h1 className="max-w-4xl text-balance text-5xl font-semibold tracking-[-0.035em] text-zinc-50 sm:text-6xl lg:text-7xl">
-                Turn a product idea into a creator-ready shot list.
-              </h1>
-              <p className="max-w-2xl text-pretty text-base leading-7 text-zinc-400 sm:text-lg">
-                The agent plans scenes, refines visual prompts, generates media assets, and returns a polished timeline for a short UGC video.
-              </p>
-            </div>
+        <section className="grid gap-10 py-10 sm:py-14 lg:grid-cols-[1.15fr_1fr] lg:items-start lg:gap-14 lg:py-16">
+          <div className="lg:pt-3">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-signal">{t.heroEyebrow}</p>
+            <h1 className={cn(
+                "display mt-4 whitespace-pre-line text-balance font-semibold leading-[1.12] sm:text-5xl",
+                // Chinese lines are fixed-width glyphs; size them so each line fits a phone without an orphan.
+                locale === "zh" ? "text-[1.85rem]" : "text-4xl"
+              )}>
+              {t.heroTitle}
+            </h1>
+            <p className="mt-5 max-w-md text-pretty text-base leading-7 text-ink-2">{t.heroBody}</p>
+            <ol className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+              {t.heroSteps.map((step, index) => (
+                <li key={step} className="flex items-baseline gap-2 text-sm text-ink">
+                  <span className="font-mono text-xs text-ink-3">0{index + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
           <PromptComposer
             prompt={prompt}
+            orientation={orientation}
+            llmReady={providers ? providers.llm.length > 0 : null}
+            photoReady={providers ? providers.image.some((name) => PHOTO_PROVIDERS.includes(name)) : null}
             isGenerating={isGenerating}
             onPromptChange={setPrompt}
+            onOrientationChange={handleOrientationChange}
             onGenerate={handleGenerate}
           />
         </section>
 
         {error ? (
-          <div className="flex items-start gap-3 rounded-2xl border border-red-300/20 bg-red-300/[0.06] p-4 text-sm text-red-100">
-            <AlertCircle className="mt-0.5 h-4 w-4" />
-            <p>{error}</p>
+          <div
+            role="alert"
+            className="mb-8 flex items-start gap-3 rounded-xl border border-signal/30 bg-signal/[0.06] p-4 text-sm text-ink"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-signal" />
+            <p className="min-w-0 break-words">{error}</p>
           </div>
         ) : null}
 
-        <PipelineProgress active={isGenerating} />
-
-        {storyboard ? (
-          <StoryboardTimeline storyboard={storyboard} />
-        ) : (
-          <section className="rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-8 text-center text-zinc-500">
-            Generate a storyboard to see scripts, image prompts, generated frames, TTS status, and exportable JSON.
-          </section>
-        )}
+        <div ref={resultsRef} className="scroll-mt-4 pb-20">
+          {storyboard ? <StoryboardTimeline storyboard={storyboard} /> : <EmptyBoard orientation={orientation} />}
+        </div>
       </div>
     </main>
   );

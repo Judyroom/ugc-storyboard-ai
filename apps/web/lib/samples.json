@@ -1,0 +1,221 @@
+[
+  {
+    "id": "necklace",
+    "prompt": {
+      "zh": "一个北欧风格的奢侈品项链",
+      "en": "a minimalist Nordic luxury necklace"
+    },
+    "title": {
+      "zh": "北欧极简项链｜戴上它的那个早晨",
+      "en": "The Nordic necklace I keep reaching for"
+    },
+    "scenes": [
+      {
+        "timing_sec": 4,
+        "image_prompt": "Shot on iPhone 15 Pro, top-down handheld view of a matte ivory jewelry box on a pale oak table, morning light slicing through blinds from the left, a hand lifting the lid to reveal a thin silver chain on velvet, soft shadows, natural skin texture, authentic UGC unboxing",
+        "zh": {
+          "script_text": "[清晨鸟鸣] 周末早上，我终于拆开了等了三周的这条项链。",
+          "visual_description": "俯拍浅橡木桌面，晨光从左侧百叶窗斜切进来。一只手掀开哑光米白首饰盒，丝绒内衬里露出一截银色链条。"
+        },
+        "en": {
+          "script_text": "[birdsong] Saturday morning, and I finally opened the necklace I waited three weeks for.",
+          "visual_description": "Top-down on a pale oak table, morning light cutting through blinds from the left. A hand lifts the lid of a matte ivory box; a length of silver chain peeks out of the velvet lining."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Macro close-up, fingertips holding a small brushed-silver pebble pendant, slowly turning it toward window light, soft diffuse reflections on the matte surface, blurred linen curtain background, shallow depth of field, iPhone 15 Pro macro mode, realistic fingerprints and skin detail",
+        "zh": {
+          "script_text": "吊坠是一块很小的磨砂银，边缘几乎没有棱角，摸起来像被海水磨过的石头。",
+          "visual_description": "微距特写，指尖捏起吊坠对着窗光慢慢转动，磨砂表面泛出柔和的漫反射，背景是虚化的亚麻窗帘。"
+        },
+        "en": {
+          "script_text": "The pendant is a tiny piece of brushed silver, with edges so soft it feels like a sea-worn stone.",
+          "visual_description": "Macro close-up: fingertips turn the pendant slowly toward the window, the brushed surface catching soft diffuse light, a blurred linen curtain behind."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Medium shot in a bathroom mirror, woman in an oat-colored knit sweater fastening a delicate silver necklace behind her neck, pendant resting at the collarbone, slight steam on the mirror edges, warm white overhead light, candid handheld framing, realistic skin texture",
+        "zh": {
+          "script_text": "对着镜子扣上的那一下，链长刚好落在锁骨中间，毛衣领口也不会压住它。",
+          "visual_description": "浴室镜前中景，人物穿燕麦色针织毛衣，双手在颈后扣搭扣。镜面边缘有一点水汽，暖白顶灯。"
+        },
+        "en": {
+          "script_text": "When I fastened it in the mirror, it landed right between my collarbones, and my sweater collar doesn't hide it.",
+          "visual_description": "Medium shot in a bathroom mirror. She wears an oat-colored knit and fastens the clasp behind her neck. A little steam on the mirror edges, warm white overhead light."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Handheld tracking shot at collarbone height, woman walking on a leafy sidewalk against low autumn sun, silver pendant swaying with each step, a small glint of reflected light, gentle motion blur, warm backlight, authentic street UGC",
+        "zh": {
+          "script_text": "出门走在路上，它随着步子轻轻晃，太阳一照会闪一下，是很克制的那种亮。",
+          "visual_description": "街头跟拍，逆光。镜头与锁骨平齐，人物走在落叶人行道上，吊坠随步伐摆动，偶尔反射出一道细小的光斑。"
+        },
+        "en": {
+          "script_text": "Out on my walk it sways a little with each step and catches the sun now and then. It's a quiet kind of shine.",
+          "visual_description": "Street tracking shot into low sun, framed at collarbone height. She walks a leaf-covered sidewalk; the pendant swings with each step and throws the occasional glint."
+        }
+      },
+      {
+        "timing_sec": 5,
+        "image_prompt": "Close-up at a cafe window seat, woman resting her chin on her hand, looking into the lens with a soft smile, silver pendant at her collarbone, oat latte on the table, diffused daylight, calm ending frame, shot on iPhone 15 Pro, natural color",
+        "zh": {
+          "script_text": "它不是那种一眼很贵的首饰，但我每天都想戴。你们会选这种低调款吗？",
+          "visual_description": "咖啡馆窗边近景，人物托腮看向镜头，吊坠落在锁骨处，桌上一杯燕麦拿铁，画面安静收尾。"
+        },
+        "en": {
+          "script_text": "It doesn't shout luxury, but I want to wear it every day. Would you go for something this understated?",
+          "visual_description": "Close-up at a cafe window seat. She rests her chin on her hand and looks into the lens, pendant at her collarbone, an oat latte on the table. A quiet closing shot."
+        }
+      }
+    ]
+  },
+  {
+    "id": "espresso",
+    "prompt": {
+      "zh": "适合小户型的静奢风咖啡机",
+      "en": "a quiet luxury espresso machine for small apartments"
+    },
+    "title": {
+      "zh": "38㎡的小家，终于放下了一台好咖啡机",
+      "en": "A proper espresso machine that fits my tiny kitchen"
+    },
+    "scenes": [
+      {
+        "timing_sec": 5,
+        "image_prompt": "Wide handheld shot of a narrow compact apartment kitchen, a tape measure stretched across a 60 cm countertop, sink and a pothos plant nearby, soft morning daylight, lived-in details, realistic UGC, shot on iPhone 15 Pro ultra-wide lens",
+        "zh": {
+          "script_text": "我家厨房台面只有六十公分宽，所以挑咖啡机，我先看的是尺寸。",
+          "visual_description": "广角手持，狭长的开放式小厨房。卷尺拉过台面停在 60 厘米，旁边是水槽和一盆绿萝，早晨自然光。"
+        },
+        "en": {
+          "script_text": "My counter is only 24 inches wide, so the first thing I checked on any espresso machine was the footprint.",
+          "visual_description": "Wide handheld shot of a narrow galley kitchen. A tape measure stretches across the counter to 60 cm, with the sink and a pothos plant beside it in morning light."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Eye-level medium shot, a compact brushed stainless steel espresso machine with walnut handles tucked in a countertop corner, a magazine standing beside it for scale, window light reflecting on the brushed metal, visible wood grain, minimal quiet luxury kitchen, realistic textures",
+        "zh": {
+          "script_text": "它差不多只有一本杂志那么宽，拉丝不锈钢配胡桃木手柄，放上去一点也不挤。",
+          "visual_description": "平视中景，咖啡机放在台面角落，旁边立一本杂志做尺寸对比。拉丝金属映出窗光，胡桃木手柄纹理清晰。"
+        },
+        "en": {
+          "script_text": "It's about as wide as a magazine. Brushed steel with walnut handles, and it doesn't crowd the counter at all.",
+          "visual_description": "Eye-level medium shot. The machine sits in the counter corner with a magazine standing beside it for scale. Window light slides across the brushed steel; the walnut grain is sharp."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Close-up of espresso beans pouring into a grinder, fine grounds falling into a portafilter basket, softly blurred hallway behind with a half-closed bedroom door, early morning blue light mixed with warm under-cabinet light, handheld, authentic morning routine UGC",
+        "zh": {
+          "script_text": "[研磨声] 早上七点磨豆，声音比我想象中小，没有吵醒室友。",
+          "visual_description": "特写，咖啡豆落进研磨口，细粉落入手柄粉碗。背景虚化的走廊里，一扇卧室门半掩着。"
+        },
+        "en": {
+          "script_text": "[grinder hum] Grinding at 7 a.m. is quieter than I expected. My roommate slept right through it.",
+          "visual_description": "Close-up: beans pour into the grinder and fine grounds fall into the portafilter. In the blurred hallway behind, a bedroom door stands half closed."
+        }
+      },
+      {
+        "timing_sec": 7,
+        "image_prompt": "Low-angle side macro of espresso extraction, two thin streams of dark crema-rich coffee flowing from a spouted portafilter into a clear double-walled glass, gradient crema layers visible, warm backlight, shallow depth of field, slow and tactile, realistic liquid physics",
+        "zh": {
+          "script_text": "萃取的时候，油脂是慢慢挂下来的。这一刻我每天早上都会停下来看一会儿。",
+          "visual_description": "低机位侧面微距，双嘴流出两道细长的深褐色咖啡液，落进透明双层玻璃杯，油脂层的渐变越来越清楚。"
+        },
+        "en": {
+          "script_text": "The crema comes down slowly during the pull. I stop and watch this part every morning.",
+          "visual_description": "Low side-angle macro: two thin streams of dark espresso fall from the spouts into a clear double-walled glass, the crema layers settling into a gradient."
+        }
+      },
+      {
+        "timing_sec": 5,
+        "image_prompt": "Close-up at a small window-side dining table, a latte next to an open book, the espresso machine softly out of focus in the background, a hand entering the frame to lift the cup, calm morning light, cozy small apartment, iPhone 15 Pro natural color",
+        "zh": {
+          "script_text": "小房子也可以有一点讲究。你家台面留给咖啡的位置有多大？",
+          "visual_description": "窗边小餐桌近景，一杯拿铁和一本摊开的书，咖啡机在背景里虚化，一只手伸进画面端起杯子。"
+        },
+        "en": {
+          "script_text": "A small place can still have a few nice rituals. How much counter space do you give your coffee?",
+          "visual_description": "Close-up at a small window-side table: a latte beside an open book, the machine soft in the background, and a hand reaching in to lift the cup."
+        }
+      }
+    ]
+  },
+  {
+    "id": "skincare",
+    "prompt": {
+      "zh": "东京雨天早晨用的旅行护肤套装",
+      "en": "a travel skincare kit for rainy Tokyo mornings"
+    },
+    "title": {
+      "zh": "东京下雨的早上，我只带了这一小包护肤",
+      "en": "Rainy Tokyo mornings, one tiny skincare kit"
+    },
+    "scenes": [
+      {
+        "timing_sec": 5,
+        "image_prompt": "Medium shot by a Tokyo hotel window, raindrops streaking down the glass, blurred neon signs and a wet street outside, woman seen from behind sitting on the bed edge touching her cheek, cool grey morning light, cinematic yet casual travel UGC, shot on iPhone 15 Pro",
+        "zh": {
+          "script_text": "[窗外雨声] 东京第三天，又下雨了，酒店空调吹得脸有点干。",
+          "visual_description": "酒店窗边中景，雨滴顺着玻璃往下流，窗外是模糊的霓虹和湿漉漉的街道。人物背对镜头坐在床边，摸了摸脸颊。"
+        },
+        "en": {
+          "script_text": "[rain on the window] Day three in Tokyo, raining again, and the hotel AC has left my skin a little dry.",
+          "visual_description": "Medium shot by the hotel window. Rain runs down the glass over blurred neon and a wet street. She sits on the edge of the bed with her back to us, touching her cheek."
+        }
+      },
+      {
+        "timing_sec": 5,
+        "image_prompt": "Top-down shot on white hotel bedsheets, a frosted translucent zip pouch unzipped with four small travel bottles laid out in a row: cleanser, toner, serum, cream, a transit card and earbuds beside them, soft overcast light, clean flat lay but imperfect, realistic UGC",
+        "zh": {
+          "script_text": "整套就这么一个半透明小包，四瓶加起来，还没有一瓶矿泉水重。",
+          "visual_description": "俯拍白色床单，一只磨砂半透明拉链包敞开，排出四支小瓶：洁面、化妆水、精华、面霜，旁边放着交通卡和耳机。"
+        },
+        "en": {
+          "script_text": "The whole kit is one frosted pouch. All four bottles together weigh less than a bottle of water.",
+          "visual_description": "Top-down on white sheets: a frosted zip pouch lies open with four small bottles in a row (cleanser, toner, serum, cream), next to a transit card and earbuds."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Close-up in a hotel bathroom mirror, palm pressing a pump bottle and patting toner onto the cheek, tiny droplets glistening on real skin texture with visible pores, warm vanity light, candid handheld, no retouching, authentic skincare UGC",
+        "zh": {
+          "script_text": "化妆水是按压式的，拍上去有一点凉，像把窗外的湿气借了一点过来。",
+          "visual_description": "浴室镜前近景，手掌按压瓶子取液，轻拍脸颊。皮肤上有细小的水珠反光，暖黄色的镜前灯。"
+        },
+        "en": {
+          "script_text": "The toner is a pump, and it feels a little cool going on, like borrowing some of the humidity outside.",
+          "visual_description": "Close-up at the bathroom mirror. A palm presses the pump and pats toner onto her cheek; tiny droplets catch the warm vanity light."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Medium shot in a hotel corridor in front of elevator doors, woman adjusting a scarf while gently pressing her cheek with her fingertips, lit floor number display above, cool fluorescent light mixed with warm wall sconces, handheld, natural moment, realistic skin",
+        "zh": {
+          "script_text": "面霜很薄，等电梯的工夫就吸收了，出门也不会粘到围巾上。",
+          "visual_description": "酒店走廊，电梯门前中景。人物一边整理围巾，一边用指腹轻按脸颊，头顶的楼层数字亮着。"
+        },
+        "en": {
+          "script_text": "The cream is light enough to sink in while I wait for the elevator, so nothing sticks to my scarf.",
+          "visual_description": "Medium shot in the hotel corridor at the elevator. She adjusts her scarf and presses her cheek with her fingertips under the lit floor display."
+        }
+      },
+      {
+        "timing_sec": 6,
+        "image_prompt": "Low-angle street shot, woman with a clear umbrella crossing a rainy Shibuya intersection, rain streaks lit by neon signs, she glances back at the camera, wet reflective pavement, moody but warm, handheld travel UGC ending frame, shot on iPhone 15 Pro",
+        "zh": {
+          "script_text": "撑着伞走进涩谷的雨里，脸还是润润的。出门旅行，你们会带几瓶护肤？",
+          "visual_description": "街头低机位，人物撑着透明雨伞穿过涩谷路口，雨丝在霓虹下清晰可见。人物回头看向镜头，画面收尾。"
+        },
+        "en": {
+          "script_text": "Umbrella up, out into the Shibuya rain, and my skin still feels comfortable. How many bottles do you pack for a trip?",
+          "visual_description": "Low-angle street shot: she crosses the rainy Shibuya intersection under a clear umbrella, rain streaks lit by neon, and glances back at the camera to close."
+        }
+      }
+    ]
+  }
+]

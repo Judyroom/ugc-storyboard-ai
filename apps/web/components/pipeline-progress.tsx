@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Loader2 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { Check } from "lucide-react";
 
-const STAGES = [
-  "Script breakdown",
-  "Visual planning",
-  "Image generation",
-  "TTS voice pass",
-];
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+
+const STAGE_COUNT = 4;
 
 type PipelineProgressProps = {
   active: boolean;
@@ -17,7 +14,7 @@ type PipelineProgressProps = {
 
 export function PipelineProgress({ active }: PipelineProgressProps) {
   const [currentStage, setCurrentStage] = useState(0);
-  const reduceMotion = useReducedMotion();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!active) {
@@ -25,9 +22,10 @@ export function PipelineProgress({ active }: PipelineProgressProps) {
       return;
     }
 
+    // Estimated progress until the API streams real stages: advance, then hold on the last one.
     const interval = window.setInterval(() => {
-      setCurrentStage((stage) => (stage + 1) % STAGES.length);
-    }, 900);
+      setCurrentStage((stage) => Math.min(stage + 1, STAGE_COUNT - 1));
+    }, 2500);
 
     return () => window.clearInterval(interval);
   }, [active]);
@@ -37,52 +35,33 @@ export function PipelineProgress({ active }: PipelineProgressProps) {
   }
 
   return (
-    <motion.section
-      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-violet-300/20 bg-violet-300/[0.06] p-5"
-    >
-      <div className="flex items-center gap-3">
-        <Loader2 className="h-5 w-5 animate-spin text-violet-200" />
-        <div>
-          <p className="text-sm font-medium text-violet-100">Agent pipeline is working</p>
-          <p className="text-sm text-zinc-400">Planning scenes, prompts, images, and voice assets.</p>
-        </div>
-      </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-4">
-        {STAGES.map((stage, index) => {
-          const isDone = index < currentStage;
-          const isCurrent = index === currentStage;
+    <ol aria-live="polite" className="grid grid-cols-2 gap-px border-t border-rule bg-rule sm:grid-cols-4">
+      {t.stages.map((stage, index) => {
+        const isDone = index < currentStage;
+        const isCurrent = index === currentStage;
 
-          return (
-            <div
-              key={stage}
-              className="rounded-xl border border-white/10 bg-black/30 p-3"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-zinc-200">{stage}</span>
-                {isDone ? (
-                  <Check className="h-4 w-4 text-emerald-300" />
-                ) : (
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      isCurrent ? "bg-violet-200" : "bg-zinc-700"
-                    }`}
-                  />
+        return (
+          <li
+            key={stage}
+            aria-current={isCurrent ? "step" : undefined}
+            className="flex items-center gap-2 bg-sheet px-4 py-3 text-xs"
+          >
+            {isDone ? (
+              <Check className="h-3.5 w-3.5 text-ink-2" />
+            ) : (
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full",
+                  isCurrent ? "animate-pulse bg-signal" : "bg-rule"
                 )}
-              </div>
-              <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  className="h-full bg-violet-300"
-                  initial={false}
-                  animate={{ width: isDone || isCurrent ? "100%" : "0%" }}
-                  transition={{ duration: reduceMotion ? 0 : 0.5 }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </motion.section>
+              />
+            )}
+            <span className={cn(isCurrent ? "font-medium text-ink" : isDone ? "text-ink-2" : "text-ink-3")}>
+              {stage}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
