@@ -14,9 +14,12 @@ FastAPI backend for the mini demo. It exposes `POST /generate` and returns a UGC
 
 ## Environment
 
-- `DEEPSEEK_API_KEY`: Enables DeepSeek planner generation.
-- `DEEPSEEK_BASE_URL`: Optional OpenAI-compatible base URL. Defaults to `https://api.deepseek.com`.
-- `DEEPSEEK_MODEL`: Optional planner model. Defaults to `deepseek-chat`.
-- `HF_TOKEN`: Enables FLUX.1-schnell image generation through Hugging Face.
+Every provider is optional and skipped when its key is missing. See `.env.example` for all slots.
+
+- Text LLM, tried in `LLM_PROVIDERS` order: `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, or any OpenAI-compatible endpoint via `LLM_API_KEY` + `LLM_BASE_URL` + `LLM_MODEL`. None configured: mock storyboard.
+- Images, tried per scene in `IMAGE_PROVIDERS` order: Cloudflare Workers AI (`CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN`), Hugging Face (`HF_TOKEN`), Pollinations (`POLLINATIONS_TOKEN` or `POLLINATIONS_ANONYMOUS=1`), then `sketch` (the text LLM draws an SVG line sketch). None succeed: placeholder frames.
+- Voice: edge-tts, no key. Override voices with `TTS_VOICE_ZH` / `TTS_VOICE_EN`.
 - `PUBLIC_BASE_URL`: Public API URL used to build generated media links.
 - `CORS_ORIGINS`: Comma-separated frontend origins.
+
+`GET /providers` lists which providers are configured, in the order they are tried.

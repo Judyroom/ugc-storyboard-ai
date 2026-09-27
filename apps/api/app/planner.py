@@ -1,10 +1,22 @@
 import json
-import os
+import logging
 import re
 from typing import Any
 
-from app.prompts import PLANNER_SYSTEM_PROMPT, planner_user_prompt
-from app.schemas import Storyboard
+from pydantic import ValidationError
+
+from app.llm import LLMProvider, configured_providers
+from app.prompts import fix_json_prompt, planner_system_prompt, planner_user_prompt
+from app.schemas import Language, Orientation, Storyboard
+
+
+logger = logging.getLogger(__name__)
+
+MAX_ATTEMPTS = 2
+
+
+class PlannerUnavailable(RuntimeError):
+    pass
 
 
 def _extract_json(text: str) -> dict[str, Any]:
@@ -21,24 +33,41 @@ def _extract_json(text: str) -> dict[str, Any]:
     return json.loads(cleaned[start : end + 1])
 
 
-async def plan_storyboard(user_prompt: str) -> Storyboard:
-    api_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("LLM_API_KEY")
-    if not api_key:
-        raise RuntimeError("DEEPSEEK_API_KEY is not configured.")
+async def _plan_with(
+    provider: LLMProvider, user_prompt: str, language: Language, orientation: Orientation
+) -> Storyboard:
+    model = provider.chat_model()
+    messages = [
+        ("system", planner_system_prompt(language)),
+        ("human", planner_user_prompt(user_prompt, language, orientation)),
+    ]
 
-    from langchain_openai import ChatOpenAI
+    last_error: Exception | None = None
+    for _ in range(MAX_ATTEMPTS):
+        result = await model.ainvoke(messages)
+        content = str(result.content)
+        try:
+            return Storyboard.model_validate(_extract_json(content))
+        except (ValueError, ValidationError) as exc:
+            last_error = exc
+            # Show the model its own output and what was wrong with it, then ask again.
+            messages += [("ai", content), ("human", fix_json_prompt(exc, language))]
 
-    model = ChatOpenAI(
-        model=os.getenv("DEEPSEEK_MODEL", os.getenv("LLM_MODEL", "deepseek-chat")),
-        api_key=api_key,
-        base_url=os.getenv("DEEPSEEK_BASE_URL", os.getenv("LLM_BASE_URL", "https://api.deepseek.com")),
-        temperature=0.8,
-    )
-    result = await model.ainvoke(
-        [
-            ("system", PLANNER_SYSTEM_PROMPT),
-            ("human", planner_user_prompt(user_prompt)),
-        ]
-    )
-    payload = _extract_json(str(result.content))
-    return Storyboard.model_validate(payload)
+    raise ValueError(f"invalid storyboard after {MAX_ATTEMPTS} attempts: {last_error}")
+
+
+async def plan_storyboard(
+    user_prompt: str, language: Language = "zh", orientation: Orientation = "portrait"
+) -> tuple[Storyboard, str]:
+    """Returns the storyboard and the name of the provider that produced it."""
+    providers = configured_providers()
+    if not providers:
+        raise PlannerUnavailable("No LLM provider is configured.")
+
+    for provider in providers:
+        try:
+            return await _plan_with(provider, user_prompt, language, orientation), provider.name
+        except Exception:
+            logger.exception("Planner provider %s failed", provider.name)
+
+    raise PlannerUnavailable(f"All LLM providers failed: {', '.join(p.name for p in providers)}.")
