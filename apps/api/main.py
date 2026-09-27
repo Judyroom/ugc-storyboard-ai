@@ -35,6 +35,9 @@ cors_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
+    # Optional, for hosts whose URL changes per deploy, e.g. Vercel previews:
+    # https://ugc-storyboard-[a-z0-9]+-ruyu-s-projects\.vercel\.app
+    allow_origin_regex=os.getenv("CORS_ORIGIN_REGEX") or None,
     allow_methods=["*"],
     allow_headers=["*"],
 )
